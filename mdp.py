@@ -9,17 +9,16 @@ import numpy as np
 class MDP:
     def __init__(self, filepath: str):
         self.mdp = self.build_mdp(filepath)
-        self.states = self.mdp['s']
-        self.actions = self.mdp['a']
-        self.probabilities = self.mdp['p']
-        self.rewards = self.mdp['r']
-        self.gamma = self.mdp['y']
+        self.states = self.mdp["s"]
+        self.actions = self.mdp["a"]
+        self.probabilities = self.mdp["p"]
+        self.rewards = self.mdp["r"]
+        self.gamma = self.mdp["y"]
         self.reachable_states = {s: [] for s in self.states}
         for a, p in self.probabilities.items():
             nonzeros = np.nonzero(p)
             for n in zip(*nonzeros):
-                self.reachable_states[f's{n[0]}'].append(f's{n[1]}')
-                
+                self.reachable_states[f"s{n[0]}"].append(f"s{n[1]}")
 
     def build_mdp(self, filepath: str) -> Dict[str, object]:
         """
@@ -46,13 +45,15 @@ class MDP:
 
             mdp["s"] = lines[0].split(",")
             assert len(mdp["s"]) > 0, "Num of states must be > 0"
-            print('Parsed states')
+            print("Parsed states")
 
             mdp["a"] = lines[1].split(",")
             assert len(mdp["a"]) > 0, "Num of actions must be > 0"
-            print('Parsed actions')
+            print("Parsed actions")
 
-            mdp["p"] = {a: np.zeros(shape=(len(mdp["s"]), len(mdp["s"]))) for a in mdp["a"]}
+            mdp["p"] = {
+                a: np.zeros(shape=(len(mdp["s"]), len(mdp["s"]))) for a in mdp["a"]
+            }
             probs_strings = lines[2].split(",")
             for s in probs_strings:
                 sasp = s.split(" ")
@@ -61,10 +62,10 @@ class MDP:
                 ), f"Probability transitions must be formatted as 's1 a1 s2 p': {sasp}"
                 mdp["p"][sasp[1]][int(sasp[0][1:])][int(sasp[2][1:])] = float(sasp[3])
             assert len(mdp["p"]) > 0, "Num of probability transitions must be > 0"
-            assert (
-                len(mdp["p"]) == len(mdp["a"])
+            assert len(mdp["p"]) == len(
+                mdp["a"]
             ), "Num of probability transition matrices must equal |a|"
-            print('Parsed probabilities')
+            print("Parsed probabilities")
 
             mdp["r"] = dict()
             rewards_strings = lines[3].split(",")
@@ -73,7 +74,7 @@ class MDP:
                 assert len(sar) == 3, "Rewards must be formatted as 's1 a1 r'"
                 mdp["r"][(sar[0], sar[1])] = float(sar[2])
             assert len(mdp["r"]) > 0, "Num of rewards must be > 0"
-            print('Parsed rewards')
+            print("Parsed rewards")
 
             mdp["y"] = float(lines[4])
             assert (
@@ -90,9 +91,9 @@ class MDP:
         return None
 
     def print_mdp(self):
-        print("States:",self.states)
-        print("Actions:",self.actions)
-        print("Probabilities:",self.probabilities)
-        print("Rewards:",self.rewards)
-        print("Gamma:",self.gamma)
-        print("Reachable States:",self.reachable_states)
+        print("States:", self.states)
+        print("Actions:", self.actions)
+        print("Probabilities:", self.probabilities)
+        print("Rewards:", self.rewards)
+        print("Gamma:", self.gamma)
+        print("Reachable States:", self.reachable_states)
