@@ -9,8 +9,8 @@ import pandas as pd
 
 
 def policy_evaluation(
-    policy: Dict[str, any], state_values: any, mdp: Dict[str, any], epsilon: float = 0.0
-):
+    policy: Dict[str, any], state_values: any, mdp: MDP, epsilon: float = 0.0
+) -> tuple[Dict[str, float], bool]:
     """
     Performs a single iteration of policy evaluation for a given policy.
 

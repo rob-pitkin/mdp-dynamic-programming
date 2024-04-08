@@ -2,14 +2,13 @@
 # Author: Rob Pitkin
 # Date: 04/03/24
 
-import copy
 import numpy as np
 from typing import Dict
 from mdp import MDP
 import pandas as pd
 from policy_evaluation import policy_evaluation
 
-def policy_iteration(policy: Dict[str, any], state_values: any, mdp: Dict[str, any]) -> Dict[str, any]:
+def policy_iteration(policy: Dict[str, any], state_values: any, mdp: MDP) -> Dict[str, any]:
     """
     Performs a single iteration of policy iteration for a given policy.
 
