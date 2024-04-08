@@ -5,6 +5,7 @@
 import numpy as np
 from typing import Dict
 from mdp import MDP
+import pandas as pd
 
 
 def policy_evaluation(
@@ -35,7 +36,7 @@ def policy_evaluation(
                     mdp["r"][(state, action)] + mdp["y"] * next_state_values
                 )
             state_values_new[i] = value
-        if abs(np.max(state_values_new[i] - state_values[i])) > epsilon:
+        if np.max(np.abs(state_values_new - state_values)) > epsilon:
             did_change = True
         return state_values_new, did_change
     except Exception as e:
@@ -43,19 +44,37 @@ def policy_evaluation(
 
 
 def main():
-    mdp = MDP("/Users/robpitkin/Desktop/mdp-dynamic-programming/mdp1.txt")
+    mdp = MDP("/Users/robpitkin/Desktop/mdp-dynamic-programming/mdp2.txt")
     state_values = np.zeros(len(mdp.mdp["s"]))
     policy = {s: [] for s in mdp.states}
     for s in mdp.states:
         prob = 1.0 / len(mdp.reachable_states[s])
         for s2 in mdp.reachable_states[s]:
-            policy[s].append((f"a{s[1:]}{s2[1:]}", prob))
-    print("BEFORE:", state_values)
-    state_values, did_change = policy_evaluation(policy, state_values, mdp.mdp, 0.01)
-    print("AFTER:", state_values)
-    print("BEFORE:", state_values)
-    state_values, did_change = policy_evaluation(policy, state_values, mdp.mdp, 0.01)
-    print("AFTER:", state_values)
+            s_num = int(s[1:])
+            s2_num = int(s2[1:])
+            if s_num == s2_num - 4:
+                policy[s].append(("down", prob))
+            elif s_num == s2_num + 4:
+                policy[s].append(("up", prob))
+            elif s_num == s2_num - 1:
+                policy[s].append(("right", prob))
+            elif s_num == s2_num + 1:
+                policy[s].append(("left", prob))
+            elif s_num == s2_num:
+                policy[s].append(("stay", prob))
+            else:
+                raise KeyError
+    did_change = True
+    before, after = None, None
+    iter_num = 0
+    while did_change:
+        iter_num += 1
+        before = state_values
+        state_values, did_change = policy_evaluation(policy, state_values, mdp.mdp, 0.1)
+        after = state_values
+    print(f"POLICY EVAL TOOK {iter_num} ITERATIONS TO CONVERGE WITH EPSILON {0.01}")
+    print("BEFORE:\n", pd.DataFrame(np.resize(before, (4,4))))
+    print("AFTER:\n", pd.DataFrame(np.resize(after, (4,4))))
     return
 
 
